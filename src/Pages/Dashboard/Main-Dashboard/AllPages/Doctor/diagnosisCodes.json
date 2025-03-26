@@ -1,0 +1,36 @@
+[
+    "A00 - Cholera",
+    "B20 - HIV Disease",
+    "C34 - Lung Cancer",
+    "D50 - Iron Deficiency Anemia",
+    "E11 - Type 2 Diabetes Mellitus",
+      "A00-A09 : Intestinal infectious diseases",
+      "A15-A19: Tuberculosis",
+      "A20-A28: Certain zoonotic bacterial diseases",
+      "A30-A49: Other bacterial diseases",
+      "A50-A64: Infections with a predominantly sexual mode of transrrAsson",
+      "A65-A69: Other spirochetal diseases",
+      "A70-A74: Other diseases caused by chlamydiae",
+      "A75-A79: Rickettsioses",
+      "A80-A89: Viral infections of the central nervous system",
+      "A90-A99: Arthropod-borne viral fevers and viral hemorrhagic fevers",
+      "B00-809: Viral infections characterized by skin and mucous membrane lesions",
+      "B15-B19: Viral hepatitis",
+      "B20-B24: Human immunodeficiency virus [HIV] disease",
+      "B25-B34: Other viral diseases",
+      "B35-B49: Mycoses",
+      "B50-B64: Protozoal diseases",
+      "B65-B83: Helminthiases",
+      "B85-B89: Pediculosis, acariasis, and other infestations  ",
+      
+      "D00-D09: In situ neoplasms",
+      "D10-D36: Benign neoplasms",
+      "D37-D48: Neoplasms of uncertain or unknown behavior",
+      "C00-C96: Malignant neoplasms",
+      "890-894: Sequelae of infectious and parasitic diseases",
+      "B95-B97: Bacterial and viral infectious agents",
+      "B99-B99: Other infectious diseases",
+      "D50-D53: Nutritional anemias"
+      ]
+  
+  

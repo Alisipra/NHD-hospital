@@ -1,0 +1,97 @@
+/* Container Styling */
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    font-family: "Arial", sans-serif;
+  }
+  
+  /* Heading */
+  h1 {
+    text-align: center;
+    color:  #2de736;
+    margin-bottom: 2rem;
+  }
+  
+  /* Input Field */
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid  #2de736;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  input:focus {
+    outline: none;
+    border-color: #1abc9c;
+    box-shadow: 0 0 8px rgba(26, 188, 156, 0.6);
+  }
+  
+  /* Search Button */
+  button {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    margin-bottom: 20px;
+    background:  #2de736;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background: #2980b9;
+  }
+  
+  /* Patient Details */
+  .patientDetails {
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+    background: #ecf0f1;
+  }
+  
+  .patientDetails h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  /* Medical History */
+  .historyContainer {
+    margin-top: 20px;
+  }
+  
+  .historyCard {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .historyCard p {
+    margin: 5px 0;
+  }
+  
+  .noHistory {
+    color: #e74c3c;
+    font-style: italic;
+  }
+  
+  /* New Patient Message */
+  .newPatient {
+    text-align: center;
+    color: #e67e22;
+    font-weight: bold;
+  }
+  

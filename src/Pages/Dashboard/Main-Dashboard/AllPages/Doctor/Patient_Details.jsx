@@ -4,11 +4,10 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import Topbar from "../../GlobalFiles/Topbar";
-// import "bootstrap/dist/css/bootstrap.min.css";
-// import "../../AllPages/Doctor/CSS/Patient_Details.css";
+
 
 const { Search } = Input;
-
+const url="https://nhd-server.vercel.app"
 const Patient_Details = () => {
   const { data } = useSelector((store) => store.auth);
   const [patients, setPatients] = useState([]);
@@ -18,7 +17,7 @@ const Patient_Details = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch("http://localhost:1000/patients/");
+        const response = await fetch(`${url}/patients/`);
         const result = await response.json();
 
         if (response.ok) {

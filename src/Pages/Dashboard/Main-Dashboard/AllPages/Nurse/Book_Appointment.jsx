@@ -8,16 +8,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
 const notify = (text) => toast(text);
-
+const url="https://nhd-server.vercel.app"
 const Book_Appointment = () => {
   const dispatch = useDispatch();
   const [Loading, setLoading] = useState(false);
    useEffect(() => {
       const fetchDoctors = async () => {
         try {
-          let response = await fetch("http://localhost:1000/doctors/"); // Update with your correct API URL
+          let response = await fetch(`${url}/doctors/`); // Update with your correct API URL
           let data = await response.json();
-          console.log("data", data);
+          
           setDoctors(data);
           setDoctors(data);
         } catch (error) {
@@ -25,7 +25,7 @@ const Book_Appointment = () => {
         }
       };
       fetchDoctors();
-      console.log("doc state", doctors);
+      
     }, []);
   
 
@@ -79,7 +79,7 @@ const Book_Appointment = () => {
         <Sidebar />
         <div className="AfterSideBar">
           <div className="Main_Add_Doctor_div">
-            <h1>Book Appointment</h1>
+            <h1 style={{color:"#199A8E"}}>Book Appointment</h1>
             <form onSubmit={HandleOnsubmitAppointment}>
             <div>
                 <label>CNIC</label>
@@ -191,9 +191,11 @@ const Book_Appointment = () => {
               </div>
 
               {/* select doctor */}
-              <div className="form-group">
+              <div>
+              <label className="align-items-center">Choose Doctor</label>
+              <div className="form-group inputdiv" style={{width:"33rem"}}>
                         <select
-                          className="form-select form-control"
+                          className="p-2"
                           name="doctorID"
                           onChange={HandleAppointment}
                           required
@@ -205,7 +207,8 @@ const Book_Appointment = () => {
                             </option>
                           ))}
                         </select>
-                      </div>
+                        </div>
+                        </div>   
 
               {/* ADDRESS SECTION  */}
 

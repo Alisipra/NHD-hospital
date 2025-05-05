@@ -17,15 +17,16 @@ import Add_Patient from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Add_Pa
 import Book_Appointment from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Book_Appointment";
 import Nurse_Profile from "../Pages/Dashboard/Main-Dashboard/AllPages/Nurse/Nurse_Profile";
 import FrontPage from "../Pages/Dashboard/Main-Dashboard/GlobalFiles/FrontPage";
-import Navbar from "../Components/Navbar/Navbar"
-import Medicalhistory from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/medicalhistory/Medicalhistory"
+import Navbar from "../Components/Navbar/Navbar";
+import Medicalhistory from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/medicalhistory/Medicalhistory";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Diagnosis from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/Diagnosis";
+import Admit_patient from "../Pages/Dashboard/Main-Dashboard/AllPages/Doctor/Admit_patient";
 const AllRoutes = () => {
   return (
     <>
       <Routes>
-      
         <Route path="/navbar" element={<Navbar />} />
         <Route path="/" element={<DLogin />} />
         <Route path="/dashboard" element={<FrontPage />} />
@@ -42,6 +43,8 @@ const AllRoutes = () => {
         <Route path="/patientdetails" element={<Patient_Details />} />
         <Route path="/doctorprofile" element={<Doctor_Profile />} />
         <Route path="/medicalhistory" element={<Medicalhistory />} />
+        <Route path="/diagnosis" element={<Diagnosis />} />
+        <Route path="/admitpatient" element={<Admit_patient />} />
         ******************** Nurse Part *************************
         <Route path="/addpatient" element={<Add_Patient />} />
         <Route path="/bookappointment" element={<Book_Appointment />} />

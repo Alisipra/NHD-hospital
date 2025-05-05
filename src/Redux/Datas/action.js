@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const url="https://nhd-server.vercel.app"
 // CreateReport
 
 export const CreateReport = (data) => async (dispatch) => {
@@ -10,12 +11,12 @@ export const CreateReport = (data) => async (dispatch) => {
     dispatch({ type: types.CREATE_REPORT_REQUEST });
     
     const res = await axios.post(
-      "http://localhost:1000/reports/create",
+      `${url}/reports/create`,
       data
     );
     
 
-    // console.log("✅ Report created successfully:", res.data);
+    
     
     dispatch({
       type: types.CREATE_REPORT_SUCCESS,
@@ -43,9 +44,9 @@ export const GetDoctorDetails = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_DOCTOR_REQUEST });
     const res = await axios.get(
-      "http://localhost:1000/doctors"
+      `${url}/doctors`
     );
-    // console.log("API Response:", res.data);
+    
 
     
 
@@ -71,10 +72,10 @@ export const AddPatients = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.ADD_PATIENT_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/patients/register",
+      `${url}/patients/register`,
       data
     );
-    console.log("i m backend",res)
+    
     return res.data;
    
   } catch (error) {
@@ -95,17 +96,12 @@ export const CreateBeds = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.ADD_BED_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/beds/add",
+      `${url}/beds/add`,
       data
     );
     
     return res.data;
-    // dispatch({
-    //   type: types.ADD_BED_SUCCESS,
-    //   payload: {
-    //
-    //   },
-    // });
+   
   } catch (error) {
     const errorMessage = error?.response?.data?.message || "An error occurred";
 
@@ -124,16 +120,11 @@ export const CreatePayment = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_PAYMENT_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/payments/add",
+      `${url}/payments/add`,
       data
     );
-    console.log(res.data);
-    // dispatch({
-    //   type: types.CREATE_PAYMENT_SUCCESS,
-    //   payload: {
-    //
-    //   },
-    // });
+    
+   
   } catch (error) {
     dispatch({
       type: types.CREATE_PAYMENT_ERROR,
@@ -148,31 +139,33 @@ export const CreatePayment = (data) => async (dispatch) => {
 export const GetBeds = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_BED_REQUEST });
-    const res = await axios.get("http://localhost:1000/beds/available");
-    console.log(res);
+
+    const res = await axios.get(`${url}/beds/available`);
+
+    
+    
     dispatch({
       type: types.GET_BED_SUCCESS,
-      payload: res.data,
+      payload: res.data, // ✅ FIXED
     });
   } catch (error) {
     dispatch({
       type: types.GET_BED_ERROR,
-      payload: {
-        message: error,
-      },
+      payload: { message: error },
     });
   }
 };
+
 
 //CREATE BOOKING
 export const CreateBooking = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.CREATE_BOOKING_REQUEST });
     const res = await axios.post(
-      `http://localhost:1000/appointments/create`,
+      `${url}/appointments/create`,
       data
     );
-    console.log(res);
+    
     // dispatch({ type: types.CREATE_BOOKING_SUCCESS, payload: res.data.postData });
   } catch (error) {
     console.log(error);
@@ -184,16 +177,11 @@ export const AddBed = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.ADD_BEDS_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/beds/add",
+      `${url}/beds/add`,
       data
     );
-    console.log(res);
-    // dispatch({
-    //   type: types.ADD_BEDS_SUCCESS,
-    //   payload: {
-
-    //   },
-    // });
+    
+    
     return res.data;
   } catch (error) {
     dispatch({
@@ -210,24 +198,14 @@ export const GetSingleBed = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_SINGLE_BEDS_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/beds/single",
+      `${url}/beds/single`,
       data
     );
-    // console.log(res);
+    
     return res.data;
-    // dispatch({
-    //   type: types.GET_SINGLE_BEDS_SUCCESS,
-    //   payload: {
-
-    //   },
-    // });
+    
   } catch (error) {
-    // dispatch({
-    //   type: types.GET_SINGLE_BEDS_ERROR,
-    //   payload: {
-    //     message: error,
-    //   },
-    // });
+   
     console.log(error);
   }
 };
@@ -237,10 +215,10 @@ export const EditSingleBed = (data, id) => async (dispatch) => {
   try {
     dispatch({ type: types.GET_SINGLE_BEDS_REQUEST });
     const res = await axios.patch(
-      `http://localhost:1000/beds/${id}`,
+      `${url}/beds/${id}`,
       data
     );
-    // console.log(res);
+    
     return res.data;
     // dispatch({
     //   type: types.GET_SINGLE_BEDS_SUCCESS,
@@ -264,10 +242,10 @@ export const dischargePatient = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.DISCHARGE_PATIENT_REQUEST });
     const res = await axios.put(
-      `http://localhost:1000/beds/discharge`,
+      `${url}/beds/discharge`,
       data
     );
-    console.log(res);
+    
     // return res.data;
     dispatch({
       type: types.DISCHARGE_PATIENT_SUCCESS,
@@ -291,9 +269,9 @@ export const GetPatients = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_PATIENT_REQUEST });
     const res = await axios.get(
-      `http://localhost:1000/patients`
+      `${url}/patients`
     );
-    console.log(res.data);
+    
     dispatch({
       type: types.GET_PATIENT_SUCCESS,
       payload: res.data,
@@ -308,9 +286,9 @@ export const GetAllData = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_ALLDATA_REQUEST });
     const res = await axios.get(
-      `http://localhost:1000/hospitals`
+      `${url}/hospitals`
     );
-    console.log(res.data);
+    
     dispatch({
       type: types.GET_ALLDATA_SUCCESS,
       payload: res.data,
@@ -331,14 +309,14 @@ export const fetchDoctorAppointments = () => async (dispatch, getState) => {
       throw new Error("Doctor ID not found");
     }
 
-    // ✅ Include Authorization header with JWT token
-    const res = await axios.get("http://localhost:1000/appointments/", {
+    //  Include Authorization header with JWT token
+    const res = await axios.get(`${url}/appointments/`, {
       headers: {
         Authorization: `Bearer ${token}`, // Sending JWT token
       },
     });
 
-    // ✅ Ensure only the logged-in doctor's appointments are filtered
+    //  Ensure only the logged-in doctor's appointments are filtered
     const filteredAppointments = res.data.filter(
       (appt) => appt.doctorID === doctorID
     );
@@ -361,9 +339,9 @@ export const GetAllAppointment = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_APPOINTMENT_DETAILS_REQUEST });
     const res = await axios.get(
-      `http://localhost:1000/appointments/`
+      `${url}/appointments/`
     );
-    // console.log(res.data);
+   
     // return res.data;
     dispatch({
       type: types.GET_APPOINTMENT_DETAILS_SUCCESS,
@@ -379,9 +357,9 @@ export const DeleteAppointment = (id) => async (dispatch) => {
   try {
     dispatch({ type: types.DELETE_APPOINTMENT_REQUEST });
     const res = await axios.delete(
-      `http://localhost:1000/appointments/${id}`
+      `${url}/appointments/${id}`
     );
-    console.log(res.data);
+    
     // return res.data;
     dispatch({
       type: types.DELETE_APPOINTMENT_SUCCESS,
@@ -397,9 +375,9 @@ export const GetAllReports = () => async (dispatch) => {
   try {
     dispatch({ type: types.GET_REPORTS_REQUEST });
     const res = await axios.get(
-      `http://localhost:1000/reports`
+      `${url}/reports`
     );
-    // console.log(res.data);
+    
     return res.data;
     // dispatch({
     //   type: types.DELETE_APPOINTMENT_SUCCESS,

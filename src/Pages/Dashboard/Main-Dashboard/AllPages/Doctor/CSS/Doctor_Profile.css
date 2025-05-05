@@ -21,12 +21,12 @@
   margin: 0rem 1rem;
 }
 .update_btn{
-  background-color: rgba(17, 234, 46, 0.874) !important;
+  background-color: #199A8E !important;
   font-size: medium !important;
 }
 
 .singleitemdiv:nth-child(even) .singledivicons {
-  color: #ff6f6f;
+  color: #199A8E;
 }
 
 .singleitemdiv:nth-child(odd) .singledivicons {

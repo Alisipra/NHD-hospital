@@ -21,7 +21,7 @@
 }
 
 .singleitemdiv:nth-child(even) .singledivicons {
-  color: #ff6f6f;
+  color: #199A8E;
 }
 
 .singleitemdiv:nth-child(odd) .singledivicons {
@@ -60,7 +60,7 @@
   display: flex;
   gap: 1rem;
   box-shadow: 0px 0px 3px -1px #4f33ea;
-  background-color: #01f45e;
+  background-color: #199A8E;
   text-align: center;
 }
 

@@ -78,7 +78,7 @@ main {
 }
 
 .sidebar {
-  background: rgba(17, 234, 46, 0.874);
+  background:#199A8E;
   color: #fff;
   height: 100vh;
   transition: all 0.5s;
@@ -132,7 +132,7 @@ main {
 .AfterSideBar {
   width: 100%;
   /* margin: 2rem; */
-  color: #2de736;
+  color: #199A8E;
   
 }
 
@@ -159,7 +159,7 @@ main {
 }
 .patientDetails h1 {
   margin-bottom: 1rem;
-  color: #2de736;
+  color: #199A8E;
   
 }
 
@@ -187,7 +187,12 @@ main {
 
 .overviewIcon {
   font-size: 4rem;
-  color: rgb(184 191 234);
+  color: #199A8E;
+}
+.form-group select {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* ******************************************************** */

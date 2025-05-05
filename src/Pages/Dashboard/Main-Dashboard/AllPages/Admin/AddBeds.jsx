@@ -14,6 +14,7 @@ const AddBeds = () => {
     roomNumber: "none",
     bedNumber: "",
     occupied: "available",
+    ward:""
   };
   const [BedData, setBedData] = useState(InitData);
 
@@ -82,7 +83,20 @@ const AddBeds = () => {
                   />
                 </div>
               </div>
-
+            {/* wards adding */}
+            <div>
+                <label>Room Number</label>
+                <div className="inputdiv">
+                  <input
+                    type="text"
+                    placeholder="ward name"
+                    name="ward"
+                    value={BedData.ward}
+                    onChange={HandleAmbuChange}
+                    required
+                  />
+                </div>
+              </div>
               <button type="submit" className="formsubmitbutton">
                 {loading ? "Loading..." : "Submit"}
               </button>

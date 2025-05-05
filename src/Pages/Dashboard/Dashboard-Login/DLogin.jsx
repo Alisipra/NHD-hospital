@@ -67,10 +67,10 @@ const DLogin = () => {
       data.adminID = formValues.ID;
       action = AdminLogin;
     }
-    console.log("Data sent to backend: ", data); 
+    
     try {
       const res = await dispatch(action(data));
-    console.log("🎯 Response from dispatch: ", res);
+    
       
       if (res?.message === "Login Successful" || res?.message === "Successful") {
         notify("Login Successful", "success");
@@ -132,7 +132,7 @@ const DLogin = () => {
 
         {/* Right Side Login Form */}
         <div className="rightside">
-          <h1>Login</h1>
+          <h1 className="text-white">Login</h1>
 
           {/* Role Selection */}
           <Radio.Group value={placement} onChange={handlePlacementChange} className="radiogroup">
@@ -155,7 +155,7 @@ const DLogin = () => {
             <input type="password" name="password" value={formValues.password} onChange={handleChange} required />
 
             <button type="submit" disabled={loading}>
-              {loading ? "Loading..." : "Submit"}
+              {loading ? "Loading..." : "Login"}
             </button>
 
             {/* Forget Password */}

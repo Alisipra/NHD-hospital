@@ -34,6 +34,7 @@ export default function dataReducer(state = initialState, { type, payload }) {
       };
 
     case types.GET_BED_SUCCESS:
+      
       return {
         ...state,
         loading: false,

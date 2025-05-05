@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { CreateReport } from "../../../../../Redux/Datas/action";
@@ -8,12 +8,52 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import DiagnosisInput from "./DiagnosisInput";
 const notify = (text) => toast(text);
-
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+const url="https://nhd-server.vercel.app"
 const Discharge_and_Create_Slip = () => {
   const { data } = useSelector((store) => store.auth);
   const doctor = useSelector((state) => state.auth.data.user); // Get doctor info
-   
-   
+  
+  
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+  const [text, setText] = useState(transcript);
+
+  // If the browser does not support speech recognition, show a message
+  if (!browserSupportsSpeechRecognition) {
+    return <p>Speech recognition is not supported in this browser.</p>;
+  }
+
+  // Update the text area with the speech input
+  const handleStartListening = () => {
+    SpeechRecognition.startListening({ continuous: true });
+  };
+
+  const handleStopListening = () => {
+    SpeechRecognition.stopListening();
+  };
+
+  const handleClear = () => {
+    resetTranscript();
+  };
+
+  // doctor details
+  useEffect(() => {
+    if (doctor) {
+      setReportValue((prev) => ({
+        ...prev,
+        docName: doctor.docName || "",
+        docDepartment: doctor.department?.trim() || "",
+        docMobile: doctor.mobile || "",
+      }));
+    }
+  }, [doctor]);
 
   const [loading, setLoading] = useState(false);
 
@@ -38,6 +78,7 @@ const Discharge_and_Create_Slip = () => {
     patientAge: "",
     docMobile: "",
     patientMobile: "",
+    emergencyNo: "",
     patientBloodGroup: "",
     patientGender: "",
     email: "",
@@ -48,10 +89,10 @@ const Discharge_and_Create_Slip = () => {
     patientGlucose: "",
     patientName: "",
     extrainfo: "",
-    tests:"",
+    tests: "",
     date: new Date(),
     time: "",
-   medicines: [],
+    medicines: [],
   };
 
   const [ReportValue, setReportValue] = useState(InitData);
@@ -66,66 +107,21 @@ const Discharge_and_Create_Slip = () => {
     setmed(initmed);
   };
 
-  // const HandleReportSubmit = async(e) => {
-  //   e.preventDefault();
-  //   let data = {
-  //     ...ReportValue,
-  //     medicines,
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     dispatch(CreateReport(data)).then(async(res) => {
-  //       if (res.message === "Report created successfully.") {
-  //         notify("Report Created Sucessfully");
-  //         setLoading(false);
-  //         setReportValue(InitData);
-  //         setmedicines([]);
-          
-          
-  //          // Prepare medical history data
-  //       const historyData = {
-  //       patientID: ReportValue.patientID,
-  //       doctorID: doctor._id, // Assuming logged-in doctor info is available
-  //       diagnosis: ReportValue.extrainfo || "Diagnosis not provided",
-  //       prescription: medicines.map(med => `${med.medName} (${med.dosage} - ${med.duration})`).join(", "),
-  //       tests: ReportValue.tests || "No tests conducted",
-  //       notes: ReportValue.extrainfo || "No additional notes",
-  //     }
-      
-
-  //      // Send medical history update
-  //      await axios.post("http://localhost:1000/history/add", historyData);
-  //      notify("Medical History Updated");
-  //      // Trigger update event for SearchPatientHistory
-  //      window.dispatchEvent(new CustomEvent("updateHistory", { detail: historyData }));
- 
-  //       } else {
-  //         setLoading(false);
-  //         notify("Something went Wrong");
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
   const HandleReportSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Ensure doctor and patient IDs are present
     if (!doctor?._id || !ReportValue.patientID) {
       notify("Missing doctor or patient ID");
       return;
     }
-  
+
     const data = { ...ReportValue, medicines };
-  
+
     try {
       setLoading(true);
       const res = await dispatch(CreateReport(data));
-      
 
-      
       // checking valid cnic should be here to proced
       if (res.message === "Patient not found.") {
         notify("Patient ID not found. Please enter a valid Patient CNIC.");
@@ -134,7 +130,7 @@ const Discharge_and_Create_Slip = () => {
       }
       if (res.message == "Report created successfully") {
         notify("Report Created Successfully");
-  
+
         // Prepare and send medical history
         const historyData = {
           patientID: ReportValue.patientID,
@@ -146,13 +142,15 @@ const Discharge_and_Create_Slip = () => {
           tests: ReportValue.tests || "No tests conducted",
           notes: ReportValue.extrainfo || "No additional notes",
         };
-  
-        await axios.post("http://localhost:1000/history/add", historyData);
+
+        await axios.post(`${url}/history/add`, historyData);
         notify("Medical History Updated");
-  
+
         // Trigger history update event
-        window.dispatchEvent(new CustomEvent("updateHistory", { detail: historyData }));
-  
+        window.dispatchEvent(
+          new CustomEvent("updateHistory", { detail: historyData })
+        );
+
         // Reset form
         setReportValue(InitData);
         setmedicines([]);
@@ -166,7 +164,6 @@ const Discharge_and_Create_Slip = () => {
       setLoading(false);
     }
   };
-  
 
   if (data?.isAuthticated === false) {
     return <Navigate to={"/"} />;
@@ -175,6 +172,41 @@ const Discharge_and_Create_Slip = () => {
   if (data?.user.userType !== "doctor") {
     return <Navigate to={"/dashboard"} />;
   }
+  const fetchPatientDetails = async (cnic) => {
+    if (cnic.length < 13) return; // wait until CNIC is fully typed
+
+    try {
+      const res = await axios.get(`${url}/patients/${cnic}`);
+      const { patient } = res.data;
+      
+
+      setReportValue((prev) => ({
+        ...prev,
+        patientName: patient.patientName || "",
+        patientAge: patient.age || "",
+        patientMobile: patient.mobile || "",
+        email: patient.email || "",
+        patientGender: patient.gender || "",
+        patientBloodGroup: patient.bloodGroup || "",
+        patientDisease: patient.disease || "",
+        patientTemperature: patient.temperature || "",
+        patientWeight: patient.weight || "",
+        patientBP: patient.bp || "",
+        patientGlucose: patient.glucose || "",
+      }));
+      notify("Patient details auto-filled");
+    } catch (err) {
+      console.error(err);
+      notify("Patient not found or server error");
+    }
+  };
+  useEffect(() => {
+    const cnic = ReportValue.patientID;
+    if (cnic.length === 13) {
+      fetchPatientDetails(cnic);
+    }
+  }, [ReportValue.patientID]);
+
   return (
     <>
       <ToastContainer />
@@ -274,6 +306,8 @@ const Discharge_and_Create_Slip = () => {
                   />
                 </div>
               </div>
+              {/* emergency mobile no (someone who is relative etc) */}
+
               <div>
                 <label>Email</label>
                 <div className="inputdiv">
@@ -385,16 +419,17 @@ const Discharge_and_Create_Slip = () => {
                   />
                 </div>
               </div>
+
               <div>
-                
                 <div className="inputdiv">
-                <DiagnosisInput ReportValue={ReportValue} HandleReportChange={HandleReportChange} className="codes"/>
+                  <DiagnosisInput
+                    ReportValue={ReportValue}
+                    HandleReportChange={HandleReportChange}
+                    className="codes"
+                  />
                 </div>
               </div>
-              
-              
 
-              
               {/* ******************************************** */}
               <div>
                 <label>Medicines</label>
@@ -433,18 +468,7 @@ const Discharge_and_Create_Slip = () => {
                   />
                 </div>
               </div>
-              {/* <div>
-                <label>Date</label>
-                <div className="inputdiv">
-                  <input
-                    type="date"
-                    placeholder="dd-mm-yyyy"
-                    name="date"
-                    value={ReportValue.date}
-                    onChange={HandleReportChange}
-                  />
-                </div>
-              </div> */}
+
               <div>
                 <label>Time</label>
                 <div className="inputdiv">
@@ -457,9 +481,62 @@ const Discharge_and_Create_Slip = () => {
                 </div>
               </div>
 
+              {/* Voice Assistent */}
+              <div className="">
+                <div className="container my-4">
+                  <h5 className="mb-3 fw-semibold text-primary">
+                    🎤 Voice Assistant
+                  </h5>
+
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control"
+                      rows="8"
+                      placeholder="Start speaking..."
+                      value={transcript}
+                      onChange={(e) => setText(e.target.value)}
+                      style={{ width:"100%",height:"auto" }}
+                    ></textarea>
+                  </div>
+
+                  <div className="d-flex gap-2 justify-content-between flex-wrap">
+                    <button
+                    type="button"
+                      className={`btn btn-sm ${
+                        listening ? "btn-danger" : "btn-primary"
+                      }`}
+                      onClick={
+                        listening ? handleStopListening : handleStartListening
+                      }
+                    >
+                      {listening ? "🛑 Stop" : "🎙️ Start"}
+                    </button>
+
+                    <button
+                    type="button"
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={handleClear}
+                    >
+                      🧹 Clear
+                    </button>
+
+                    <button
+                    type="button"
+                      className="btn btn-sm btn-outline-success"
+                      onClick={() => {
+                        navigator.clipboard.writeText(transcript);
+                      }}
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <button
                 className="formsubmitbutton bookingbutton"
                 onClick={HandleReportSubmit}
+                style={{ backgroundColor: "#199A8E", padding: "10px" }}
               >
                 {loading ? "Loading..." : "Generate Report"}
               </button>

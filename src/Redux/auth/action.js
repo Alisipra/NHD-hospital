@@ -1,12 +1,12 @@
 import * as types from "./types";
 import axios from "axios";
-
+const url="https://nhd-server.vercel.app"
 //login user
 export const NurseLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_NURSE_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/nurses/login",
+      `${url}/nurses/login`,
       data
     );
     dispatch({
@@ -33,10 +33,10 @@ export const DoctorLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_DOCTOR_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/doctors/login",
+      `${url}/doctors/login`,
       data
     );
-    console.log(res.data);
+    
     dispatch({
       type: types.LOGIN_DOCTOR_SUCCESS,
       payload: {
@@ -61,10 +61,10 @@ export const AdminLogin = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.LOGIN_ADMIN_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/admin/login",
+      `${url}/admin/login`,
       data
     );
-    console.log(res.data);
+    
     dispatch({
       type: types.LOGIN_ADMIN_SUCCESS,
       payload: {
@@ -89,10 +89,10 @@ export const DoctorRegister = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.REGISTER_DOCTOR_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/doctors/register",
+      `${url}/doctors/register`,
       data
     );
-    // console.log(res);
+    
     return res.data;
     // dispatch({
     //   type: types.REGISTER_DOCTOR_SUCCESS,
@@ -118,10 +118,10 @@ export const NurseRegister = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.REGISTER_NURSE_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/nurses/register",
+      `${url}/nurses/register`,
       data
     );
-    // console.log(res);
+    
     return res.data;
     // dispatch({
     //   type: types.REGISTER_NURSE_SUCCESS,
@@ -147,10 +147,10 @@ export const AdminRegister = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.REGISTER_ADMIN_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/admin/register",
+      `${url}/admin/register`,
       data
     );
-    // console.log(res);
+    
     return res.data;
     // dispatch({
     //   type: types.REGISTER_ADMIN_SUCCESS,
@@ -176,10 +176,10 @@ export const AmbulanceRegister = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.REGISTER_AMBULANCE_REQUEST });
     const res = await axios.post(
-      "http://localhost:1000/ambulances/add",
+      `${url}/ambulances/add`,
       data
     );
-    console.log(res);
+    
     // dispatch({
     //   type: types.REGISTER_AMBULANCE_SUCCESS,
     //   payload: {
@@ -215,10 +215,10 @@ export const UpdateNurse = (data, id) => async (dispatch) => {
   try {
     dispatch({ type: types.EDIT_NURSE_REQUEST });
     const res = await axios.patch(
-      `http://localhost:1000/nurses/${id}`,
+      `${url}/nurses/${id}`,
       data
     );
-    console.log(res);
+    
     dispatch({ type: types.EDIT_NURSE_SUCCESS, payload: res.data.user });
   } catch (error) {
     console.log(error);
@@ -230,10 +230,10 @@ export const UpdateDoctor = (data, id) => async (dispatch) => {
   try {
     dispatch({ type: types.EDIT_DOCTOR_REQUEST });
     const res = await axios.patch(
-      `http://localhost:1000/doctors/${id}`,
+      `${url}/doctors/${id}`,
       data
     );
-    console.log(res);
+    
     dispatch({ type: types.EDIT_DOCTOR_SUCCESS, payload: res.data.user });
   } catch (error) {
     console.log(error);
@@ -245,10 +245,10 @@ export const SendPassword = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.EDIT_DOCTOR_REQUEST });
     const res = await axios.post(
-      `http://localhost:1000/admin/password`,
+      `${url}/admin/password`,
       data
     );
-    // console.log(res);
+    
     return res.data;
   } catch (error) {
     console.log(error);
@@ -260,10 +260,10 @@ export const forgetPassword = (data) => async (dispatch) => {
   try {
     dispatch({ type: types.FORGET_PASSWORD_REQUEST });
     const res = await axios.post(
-      `http://localhost:1000/admin/forgot`,
+      `${url}/admin/forgot`,
       data
     );
-    // console.log(res);
+    
     return res.data;
   } catch (error) {
     console.log(error);

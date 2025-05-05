@@ -17,7 +17,7 @@ import { RiAdminLine } from "react-icons/ri";
 import { TbBed } from "react-icons/tb";
 import { MdDashboardCustomize } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-
+import { FaRobot } from "react-icons/fa";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,10 +33,13 @@ const Sidebar = () => {
 
   return (
     <>
-      <div >
+      <div>
         <div style={{ width: isOpen ? "200px" : "70px" }} className={`sidebar`}>
           <div className="top_section">
-            <h1 style={{ display: isOpen ? "block" : "none",color:"white" }} className="logo">
+            <h1
+              style={{ display: isOpen ? "block" : "none", color: "white" }}
+              className="logo"
+            >
               NHD
             </h1>
             <div
@@ -262,10 +265,13 @@ const Sidebar = () => {
               </Link>
             ) : null}
             {user?.userType === "doctor" ? (
+              <>
+              
               <Link
                 className="link"
                 activeclassname="active"
-                to={"/createslip"}
+                // to={"/createslip"}
+                to={"/diagnosis"}
               >
                 <div className="icon">
                   <BiDetail className="mainIcon" />
@@ -274,29 +280,33 @@ const Sidebar = () => {
                   style={{ display: isOpen ? "block" : "none" }}
                   className="link_text"
                 >
-                  Create Report
+                  {/* Create Report */}
+                  Diagnosis
                 </div>
               </Link>
+              
+              </>
+              
             ) : null}
             {/* test */}
-             {user?.userType === "doctor" ? (
-              <Link
-                className="link"
-                activeclassname="active"
-                to={"/patientdetails"}
-              >
-                <div className="icon">
-                  <TbListDetails className="mainIcon" />
-                </div>
-                <div
-                  style={{ display: isOpen ? "block" : "none" }}
-                  className="link_text"
+            {user?.userType === "doctor" ? (
+              <>
+                <Link
+                  className="link"
+                  activeclassname="active"
+                  to={"/patientdetails"}
                 >
-                  Patients
-                </div>
-              </Link>
-            ) : null}
-            <Link
+                  <div className="icon">
+                    <TbListDetails className="mainIcon" />
+                  </div>
+                  <div
+                    style={{ display: isOpen ? "block" : "none" }}
+                    className="link_text"
+                  >
+                    Patients
+                  </div>
+                </Link>
+                <Link
                   className="link"
                   activeclassname="active"
                   to={"/medicalhistory"}
@@ -311,7 +321,28 @@ const Sidebar = () => {
                     Medical History
                   </div>
                 </Link>
-            
+                <Link
+              className="link"
+              activeclassname="active"
+              to={"https://poe.com/Maseeha"}
+              target="_blank"
+            >
+              <div className="icon">
+                <FaRobot className="mainIcon" />{" "}
+                {/* Change the icon to AI-related one */}
+              </div>
+              <div
+                style={{ display: isOpen ? "block" : "none" }}
+                className="link_text"
+              >
+                Ai Assistent
+              </div>
+            </Link>
+              </>
+            ) : null}
+
+           
+
             <Link
               className="LogOutPath link"
               onClick={() => {

@@ -23,7 +23,6 @@ const Add_Admin = () => {
     DOB: "",
     address: "",
     education: "",
-    adminID: Date.now(),
     password: "",
   };
 
@@ -36,18 +35,21 @@ const Add_Admin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // console.log("Data being sent: ", JSON.stringify(adminDetails, null, 2));
-
+  
     try {
       const res = await dispatch(AdminRegister(adminDetails));
-      
-      if (res?.message === "Admin already exists") {
+  
+      if (!res || !res.data) {
+        throw new Error("Invalid response from server");
+      }
+  
+      if (res.data.message === "Admin already exists") {
         toast.error("Admin already exists");
-      } else if (res?.message === "error") {
+      } else if (res.data.message === "error") {
         toast.error("Something went wrong. Please try again.");
       } else {
         toast.success("Admin added successfully!");
-
+  
         // Send password details
         const emailData = {
           email: res.data.email,
@@ -56,18 +58,18 @@ const Add_Admin = () => {
         };
         await dispatch(SendPassword(emailData));
         toast.success("Account details sent!");
-
+  
         // Reset form
         setAdminDetails(initialFormState);
       }
-    }  catch (error) {
-      
-      toast.error(`Error: "Error adding admin."`);
-    }
-     finally {
+    } catch (error) {
+      console.error("Error adding admin:", error);
+      toast.error("Error adding admin.");
+    } finally {
       setLoading(false);
     }
   };
+  
 
   if (!data?.isAuthenticated) {
     return <Navigate to="/" />;

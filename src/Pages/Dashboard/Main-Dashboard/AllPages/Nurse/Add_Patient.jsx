@@ -14,7 +14,7 @@ import {
 import Sidebar from "../../GlobalFiles/Sidebar";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-
+const url="https://nhd-server.vercel.app"
 const notify = (text) => toast(text);
 
 const Add_Patient = () => {
@@ -25,6 +25,7 @@ const Add_Patient = () => {
   };
 
   const [loading, setLoading] = useState(false);
+  const [doctors, setDoctors] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -36,9 +37,9 @@ const Add_Patient = () => {
 
   const fetchAvailableBeds = async () => {
     try {
-      const response = await axios.get("http://localhost:1000/beds/available");
+      const response = await axios.get(`${url}/beds/available`);
       setAvailableBeds(response.data);
-      console.log(response.data);
+      
     } catch (error) {
       console.error("Error fetching available beds", error);
       notify("Error fetching available beds");
@@ -47,7 +48,21 @@ const Add_Patient = () => {
 
   useEffect(() => {
     fetchAvailableBeds();
-    // console.log(availableBeds);
+    
+  }, []);
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        let response = await fetch(`${url}/doctors/`); // Update with your correct API URL
+        let data = await response.json();
+        
+        setDoctors(data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+    
   }, []);
 
   const beforeUpload = (file) => {
@@ -91,6 +106,7 @@ const Add_Patient = () => {
     email: "",
     gender: "",
     mobile: "",
+    emergencyNo: "",
     disease: "",
     address: "",
     department: "",
@@ -101,6 +117,7 @@ const Add_Patient = () => {
     nurseID: data?.user._id,
     docID: "",
     details: "",
+    ward: "",
   };
   const [AddPatient, setAddPatient] = useState(InitData);
 
@@ -108,65 +125,80 @@ const Add_Patient = () => {
     setAddPatient({ ...AddPatient, [e.target.name]: e.target.value });
   };
 
-  const HandleOnsubmitAppointment = (e) => {
+  const HandleOnsubmitAppointment = async (e) => {
     e.preventDefault();
-
+  
     if (
       AddPatient.gender === "" ||
-      AddPatient.department === "" ||
+      AddPatient.ward === "" ||
       AddPatient.docID === "" ||
       AddPatient.bloodGroup === "" ||
       AddPatient.patientID === ""
     ) {
-      return notify("Please Enter All the Requried Feilds");
+      return notify("Please Enter All the Required Fields");
     }
+  
     try {
       setLoading(true);
-      dispatch(GetSingleBed(bedDetails)).then((res) => {
-        if (res.message === "Bed not found") {
+  
+      const res = await dispatch(GetSingleBed(bedDetails));
+  
+      if (res.message === "Bed not found" || res.message === "No Bed") {
+        notify("Bed not found");
+        setLoading(false);
+        return;
+      }
+  
+      if (res.message === "Occupied") {
+        notify("Bed already occupied");
+        setLoading(false);
+        return;
+      }
+  
+      if (res.message === "Available") {
+        const item = await dispatch(AddPatients(AddPatient));
+  
+        if (item.message === "Patient already exists") {
+          notify("Patient already exists");
           setLoading(false);
-          return notify("Bed not found");
+          return;
         }
-        if (res.message === "Occupied") {
-          setLoading(false);
-          return notify("Bed already occupied");
-        }
-        if (res.message === "No Bed") {
-          setLoading(false);
-          return notify("Bed not found");
-        }
-        if (res.message === "Available") {
-          dispatch(AddPatients(AddPatient)).then((item) => {
-            if (item.message === "Patient already exists") {
-              setLoading(false);
-              return notify("Patient already exists");
-            }
-            let data = {
-              patientID: item._id,
-              occupied: "occupied",
-            };
-            notify("Patient Added");
-
-            dispatch(EditSingleBed(data, res.id)).then((ele) =>
-              console.log(ele)
-            );
-            notify("Bed updated");
-            setLoading(false);
-            setAddPatient(InitData);
-            setbedDetails(initBed);
-          });
-        } else {
-          setLoading(false);
-          console.log("error");
-        }
-      });
-      //
-    } catch (error) {
+  
+        const data = {
+          patientID: item._id,
+          occupied: "occupied",
+        };
+  
+        notify("Patient Added");
+  
+        const ele = await dispatch(EditSingleBed(data, res.id));
+        
+        notify("Bed updated");
+  
+        setAddPatient(InitData);
+        setbedDetails(initBed);
+      }
+  
       setLoading(false);
-      console.log(error);
+    } catch (error) {
+      // Log the error object to see its structure
+      console.log("Full Error:", error);
+
+      // Check if error.response is available, then get the message
+      if (error.response) {
+        console.log("Response Error:", error.response); // Debug response
+  
+        const message = error?.response?.data?.message || "Something went wrong";
+        toast.error(message); // Show error message from backend if available
+      } else {
+        // If no response, it's likely a network error or something unexpected
+        toast.error("This patient already admited...");
+      }
+  
+      setLoading(false);
     }
   };
-
+  
   // const handleChange = (info) => {
   //   if (info.file.status === "uploading") {
   //     setLoading(true);
@@ -203,7 +235,7 @@ const Add_Patient = () => {
         <Sidebar />
         <div className="AfterSideBar">
           <div className="Main_Add_Doctor_div">
-            <h1>Add Patient</h1>
+            <h1 style={{ color: "#199A8E" }}>Add Patient</h1>
             <img src={doctor} alt="doctor" className="avatarimg" />
 
             <form onSubmit={HandleOnsubmitAppointment}>
@@ -321,7 +353,19 @@ const Add_Patient = () => {
                   />
                 </div>
               </div>
-
+              <div>
+                <label>Emergency Mobile</label>
+                <div className="inputdiv">
+                  <input
+                    type="number"
+                    placeholder="Mobile"
+                    name="emergencyNo"
+                    value={AddPatient.emergencyNo}
+                    onChange={HandleAppointment}
+                    required
+                  />
+                </div>
+              </div>
               <div>
                 <label>Details</label>
                 <div className="inputdiv">
@@ -365,6 +409,28 @@ const Add_Patient = () => {
                 </div>
               </div>
 
+              {/* ward section below */}
+              <div>
+                <label>Ward</label>
+                <div className="inputdiv">
+                  <select
+                    name="ward"
+                    value={AddPatient.ward}
+                    onChange={HandleAppointment}
+                    required
+                  >
+                    <option value="">Select Ward</option>
+                    <option value="Cardio Ward">Cardio Ward</option>
+                    <option value="Neuro Ward">Neuro Ward</option>
+                    <option value="ENT Ward">ENT Ward</option>
+                    <option value="General Ward">General Ward</option>
+                    <option value="Oncology Ward">Oncology Ward</option>
+                    <option value="Pediatrics Ward">Pediatrics Ward</option>
+                    <option value="Psych Ward">Psych Ward</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
                 <label>Bed Number</label>
                 <div className="inputdiv">
@@ -375,13 +441,16 @@ const Add_Patient = () => {
                     required
                   >
                     <option value="">Select Bed</option>
-                    {availableBeds
-                      .filter((bed) => bed.occupied === "available") // Filter available beds
-                      .map((bed) => (
-                        <option key={bed.id} value={bed.bedNumber}>
-                          Bed {bed.bedNumber} (Room {bed.roomNumber})
-                        </option>
-                      ))}
+                    {availableBeds.map((bed) => (
+                      <option
+                        key={bed.id}
+                        value={bed.bedNumber}
+                        disabled={bed.occupied !== "available"}
+                      >
+                        Bed {bed.bedNumber} - Room {bed.roomNumber} - Ward (
+                        {bed.ward}) ({bed.occupied})
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -399,7 +468,7 @@ const Add_Patient = () => {
                 </div>
               </div>
 
-              <div>
+              {/* <div>
                 <label>Department</label>
                 <div className="inputdiv">
                   <select
@@ -419,11 +488,11 @@ const Add_Patient = () => {
                     <option value="Psychiatrist">Psychiatrist</option>
                   </select>
                 </div>
-              </div>
+              </div> */}
               <div>
                 <label>Doctor</label>
                 <div className="inputdiv">
-                  <select
+                  {/* <select
                     name="docID"
                     value={AddPatient.docID}
                     onChange={HandleAppointment}
@@ -440,11 +509,23 @@ const Add_Patient = () => {
                       Dr.Sajid Zafar
                     </option>
                     <option value="63d2270dfe66e89c9be342f9">
-                      Dr. Zaid Gujjer
+                      Dr. Zaid 
                     </option>
-                    <option value="63d2270dfe66e89c9be342f9">
-                      Dr.Shoki
-                    </option>
+                   
+                  </select> */}
+                  <select
+                    className="p-2"
+                    name="docID"
+                    value={AddPatient.docID}
+                    onChange={HandleAppointment}
+                    required
+                  >
+                    <option value="">Select Doctor</option>
+                    {doctors.map((doctor) => (
+                      <option key={doctor._id} value={doctor._id}>
+                        {doctor.docName} - {doctor.department}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -454,6 +535,7 @@ const Add_Patient = () => {
                 <div className="inputdiv">
                   <select
                     name="bloodGroup"
+                    value={AddPatient.bloodGroup}
                     onChange={HandleAppointment}
                     required
                   >
@@ -510,9 +592,13 @@ const Add_Patient = () => {
               <button
                 type="submit"
                 className="formsubmitbutton"
-                style={{ width: "20%" }}
+                style={{
+                  width: "40%",
+                  backgroundColor: "#199A8E",
+                  padding: "10px",
+                }}
               >
-                {loading ? "Loading..." : "Submit"}
+                {loading ? "Loading..." : "Add"}
               </button>
             </form>
           </div>

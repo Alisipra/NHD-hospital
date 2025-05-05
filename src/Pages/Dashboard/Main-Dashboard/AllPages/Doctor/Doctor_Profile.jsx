@@ -19,7 +19,7 @@ import "./CSS/Doctor_Profile.css";
 // *********************************************************
 const Doctor_Profile = () => {
   const { data } = useSelector((store) => store.auth);
-  console.log("our data",data)
+  
 
   const disptach = useDispatch();
 

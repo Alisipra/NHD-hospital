@@ -1,18 +1,21 @@
 /* Container Styling */
 .container {
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: #ffffff;
-    font-family: "Arial", sans-serif;
-  }
+  width: 100%;
+  max-width: 100%; /* or keep 800px for large screens if you like */
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  font-family: "Arial", sans-serif;
+}
+
   
   /* Heading */
   h1 {
     text-align: center;
-    color:  #2de736;
+    color:  #199A8E;
     margin-bottom: 2rem;
   }
   
@@ -21,7 +24,7 @@
     width: 100%;
     padding: 12px;
     margin-bottom: 20px;
-    border: 2px solid  #2de736;
+    border: 2px solid  #199A8E;
     border-radius: 8px;
     font-size: 16px;
     box-sizing: border-box;
@@ -39,7 +42,7 @@
     width: 100%;
     padding: 12px 0;
     margin-bottom: 20px;
-    background:  #2de736;
+    background:  #199A8E;
     color: white;
     font-size: 18px;
     border: none;
@@ -84,14 +87,14 @@
   }
   
   .noHistory {
-    color: #e74c3c;
+    color: #199A8E;
     font-style: italic;
   }
   
   /* New Patient Message */
   .newPatient {
     text-align: center;
-    color: #e67e22;
+    color: #199A8E;
     font-weight: bold;
   }
   

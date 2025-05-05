@@ -4,12 +4,22 @@
   margin: auto;
   margin-top: 2rem;
   border-radius: 10px;
-  background-color: #12f133;
-  width: 10rem;
+  background-color: #199A8E;
+  width: 13rem;
 }
+.form-group{
+  text-align: center;
+  width: 100%;
+  margin-left: auto;
 
+}
 @media only screen and (max-width: 1024px) {
   .book_formsubmitbutton {
     width: 50%;
+  }
+}
+@media only screen and (max-width: 498px) {
+  .book_formsubmitbutton {
+    width: 100%;
   }
 }

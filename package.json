@@ -18,7 +18,6 @@
     "react-icons": "^5.5.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.0",
-    "react-scroll-to-top": "^3.0.0",
     "react-speech-recognition": "^4.0.0",
     "react-toastify": "^11.0.5",
     "redux": "^5.0.1",

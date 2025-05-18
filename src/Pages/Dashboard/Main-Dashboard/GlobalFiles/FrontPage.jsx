@@ -138,12 +138,12 @@ const FrontPage = () => {
           </div>
         </div>
         {/* ************************************* */}
-        <div className="patientDetails">
+        {/* <div className="patientDetails">
           <h1 style={{color:"#199A8E"}}>Patient Details</h1>
           <div className="patientBox">
             <Table columns={columns} dataSource={patients} />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

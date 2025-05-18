@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const url="https://nhd-server.vercel.app"
+
 // CreateReport
 
 export const CreateReport = (data) => async (dispatch) => {
@@ -190,6 +191,7 @@ export const AddBed = (data) => async (dispatch) => {
         message: error,
       },
     });
+    return { error: true, message: error.response?.data?.message || "Failed to add bed" };
   }
 };
 

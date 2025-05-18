@@ -335,7 +335,7 @@ const Sidebar = () => {
                 style={{ display: isOpen ? "block" : "none" }}
                 className="link_text"
               >
-                Ai Assistent
+               AI Assistant
               </div>
             </Link>
               </>

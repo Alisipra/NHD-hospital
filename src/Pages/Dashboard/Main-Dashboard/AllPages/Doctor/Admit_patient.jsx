@@ -4,6 +4,7 @@ import doctor from "../../../../../img/doctoravatar.png";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 const url="https://nhd-server.vercel.app"
 const AdmitPatientForm = () => {
   const [patientDetails, setPatientDetails] = useState({
@@ -38,7 +39,6 @@ const AdmitPatientForm = () => {
     try {
       const response = await axios.get(`${url}/beds/available`);
       setAvailableBeds(response.data);
-      
     } catch (error) {
       console.error("Error fetching available beds", error);
       notify("Error fetching available beds");
@@ -51,7 +51,6 @@ const AdmitPatientForm = () => {
     try {
       const response = await axios.get(`${url}/doctors/`);
       setAvailableDoctor(response.data);
-      
     } catch (error) {
       console.error("Error fetching available doctors", error);
       notify("Error fetching available doctors");
@@ -61,8 +60,6 @@ const AdmitPatientForm = () => {
   useEffect(() => {
     fetchAvailableBeds();
     fetchAvailableDoctor();
-
-    
   }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -107,52 +104,64 @@ const AdmitPatientForm = () => {
         `${url}/patients/admitPatient`,
         ipdData
       );
-      
-  
-      if (ipdResponse.data.message=="Patient admitted successfully.") {
-        toast.success(ipdResponse.data.message || "Patient admitted successfully");
-        
-  
+
+      if (ipdResponse.data.message == "Patient admitted successfully.") {
+        toast.success(
+          ipdResponse.data.message || "Patient admitted successfully"
+        );
       } else {
         toast.error(ipdResponse.data.message || "Patient Already admitted...");
       }
 
       // If IPD succeeds, then save to medical history
-      
+
       // Optional: reset form here
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error.response?.data?.message || "Failed to admit patient");
-      }
+    }
 
-      // Reseting Form
-      // setPatientDetails({
-      //   patientID: "",
-      //   patientName: "",
-      //   age: "",
-      //   gender: "",
-      //   mobile: "",
-      //   emergencyNo: "",
-      //   bloodGroup: "",
-      //   email: "",
-      //   ward: "",
-      //   bedNumber: "",
-      //   reasonForAdmission: "",
-      //   guardianName: "",
-      //   guardianContact: "",
-      //   doctorAssigned: "",
-      //   docID: "",
-      //   nurseID: "",
-      //   DOB: "",
-      //   address: "",
-      //   disease: "",
-      //   test: "",
-      //   department: "",
-      //   roomNo: "",
-      // })
-      // setbedDetails(initBed);
-
+    // Reseting Form
+    setPatientDetails({
+      patientID: "",
+      patientName: "",
+      age: "",
+      gender: "",
+      mobile: "",
+      emergencyNo: "",
+      bloodGroup: "",
+      email: "",
+      ward: "",
+      bedNumber: "",
+      reasonForAdmission: "",
+      guardianName: "",
+      guardianContact: "",
+      doctorAssigned: "",
+      docID: "",
+      nurseID: "",
+      DOB: "",
+      address: "",
+      disease: "",
+      test: "",
+      department: "",
+      roomNo: "",
+    });
+    setbedDetails(initBed);
   };
+
+  const doctorInfo = useSelector((state) => state.auth.data.user);
+  console.log("Doctor Info:", doctorInfo);
+
+  // Then auto-fill doctor on patient admission
+  useEffect(() => {
+    if (doctorInfo && doctorInfo.userType === "doctor") {
+      setPatientDetails((prev) => ({
+        ...prev,
+        doctorAssigned: doctorInfo.docName,
+        // docID: doctorInfo.docID,
+      }));
+    }
+  }, [doctorInfo]);
 
   return (
     <>
@@ -403,33 +412,14 @@ const AdmitPatientForm = () => {
                 </div>
 
                 <div>
-                  <label>Doctor Assigned</label>
+                  <label>Assigned Doctor</label>
                   <div className="inputdiv">
-                    <select
-                      onChange={(e) => {
-                        const selectedDocId = e.target.value;
-                        const selectedDoctor = availableDoctor.find(
-                          (doc) => String(doc._id) === selectedDocId
-                        );
-
-                        if (selectedDoctor) {
-                          setPatientDetails((prev) => ({
-                            ...prev,
-                            doctorAssigned: selectedDoctor.docName,
-                            docID: selectedDoctor._id, // Save MongoDB ObjectId, not doc.docID
-                          }));
-                        } else {
-                          console.warn("Selected doctor not found.");
-                        }
-                      }}
-                    >
-                      <option value="">Select Doctor</option>
-                      {availableDoctor.map((doc) => (
-                        <option key={doc._id} value={doc._id}>
-                          {doc.docName} — {doc.department}
-                        </option>
-                      ))}
-                    </select>
+                    <input
+                      type="text"
+                      name="doctorAssigned"
+                      value={patientDetails.doctorAssigned}
+                      readOnly
+                    />
                   </div>
                 </div>
 
@@ -501,7 +491,7 @@ const AdmitPatientForm = () => {
                 </div> */}
 
                 <div className="align-content-center mx-auto w-25">
-                  <button className="rounded-2 w-100 m-3" type="submit">
+                  <button className="rounded-2 w-100 m-3 p-1" type="submit">
                     Admit Patient
                   </button>
                 </div>

@@ -3,6 +3,10 @@
     padding: 0;
     box-sizing: border-box;
 }
+.action{
+    text-align: center;
+
+}
 @media only screen and (max-width: 480px) {
     .Payment_Page{
         width: 70%;

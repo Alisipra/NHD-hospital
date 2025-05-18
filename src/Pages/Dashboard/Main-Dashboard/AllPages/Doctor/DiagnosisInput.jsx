@@ -25,16 +25,16 @@ const DiagnosisInput = ({ ReportValue, HandleReportChange }) => {
   };
 
   return (
-    <div>
-      <label>Extra Info (ICD-10)</label>
-      <div className="inputdiv">
+    <div >
+      <label style={{marginLeft:"-20px"}}>Extra Info (ICD-10)</label>
+      <div className="inputdiv ">
         <input
           type="text"
           placeholder="Search Diagnosis"
           name="extrainfo"
           value={searchTerm || ReportValue.extrainfo}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{"margin-left":"120px"}}
+          style={{"margin-left":"120px",width:"auto"}}
         />
         {filteredCodes.length > 0 && (
           <ul className="dropdown">

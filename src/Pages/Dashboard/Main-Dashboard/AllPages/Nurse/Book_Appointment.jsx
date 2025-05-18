@@ -8,68 +8,211 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
 const notify = (text) => toast(text);
-const url="https://nhd-server.vercel.app"
+ const url="https://nhd-server.vercel.app"
+
+function getNextDatesForDays(days, count = 30) {
+  const dayMap = {
+    Sunday: 0,
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+  };
+
+  const result = [];
+  const today = new Date();
+
+  for (let i = 0; i < count; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() + i);
+    const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+
+    if (days.includes(dayName)) {
+      result.push(date.toISOString().split("T")[0]);
+    }
+  }
+
+  return result;
+}
+
+function getTimeSlots(range) {
+  if (!range.includes("-")) return [];
+
+  const parseTime = (timeStr) => {
+    const [time, modifier] = timeStr.trim().split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+
+    return hours * 60 + minutes;
+  };
+
+  const [startStr, endStr] = range.split("-");
+  const start = parseTime(startStr);
+  const end = parseTime(endStr);
+
+  const slots = [];
+  for (let time = start; time < end; time += 20) {
+    const hour = Math.floor(time / 60);
+    const min = time % 60;
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    const formattedTime = `${String(formattedHour).padStart(2, "0")}:${String(
+      min
+    ).padStart(2, "0")} ${ampm}`;
+    slots.push(formattedTime);
+  }
+
+  return slots;
+}
+
 const Book_Appointment = () => {
   const dispatch = useDispatch();
   const [Loading, setLoading] = useState(false);
-   useEffect(() => {
-      const fetchDoctors = async () => {
-        try {
-          let response = await fetch(`${url}/doctors/`); // Update with your correct API URL
-          let data = await response.json();
-          
-          setDoctors(data);
-          setDoctors(data);
-        } catch (error) {
-          console.error("Error fetching doctors:", error);
-        }
-      };
-      fetchDoctors();
-      
-    }, []);
-  
-
-  const InitValue = {
-    patientName: "",
+  const [formData, setFormData] = useState({
     patientID: "",
+    patientName: "",
     age: "",
     gender: "",
     mobile: "",
-    disease: "",
     address: "",
     email: "",
-    department: "",
-    date: "",
+    disease: "",
     time: "",
+    date: "",
     doctorID: "",
+    emergencyNo: null,
+    bloodGroup: "N/A",
+    ward: "General",
+    password: "default123",
+  });
+
+  const [availableDates, setAvailableDates] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [bookedTimes, setBookedTimes] = useState([]);
+  // const [BookAppoint, setBookAppoint] = useState();
+  const [doctors, setDoctors] = useState([]); // Store available doctors
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        let response = await fetch(`${url}/doctors/`); // Update with your correct API URL
+        let data = await response.json();
+
+        setDoctors(data);
+        setDoctors(data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
+  const fetchBookedTimes = async (doctorID, date) => {
+    try {
+      const token = localStorage.getItem("patientToken");
+      const res = await fetch(
+        `${url}/appointments?doctorID=${doctorID}&date=${date}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      const booked = data.map((b) => b.time);
+      setBookedTimes(booked);
+    } catch (err) {
+      console.error("Error fetching booked times:", err);
+      setBookedTimes([]);
+    }
   };
+  const handleFormChange = async (e) => {
+    const { name, value } = e.target;
+    const updatedForm = { ...formData, [name]: value };
+    setFormData(updatedForm);
 
-  const [BookAppoint, setBookAppoint] = useState(InitValue);
-   const [doctors, setDoctors] = useState([]); // Store available doctors
+    if (name === "doctorID") {
+      const selectedDoc = doctors.find((doc) => doc._id === value);
+      if (selectedDoc?.availableDays) {
+        const nextDates = getNextDatesForDays(selectedDoc.availableDays);
+        setAvailableDates(nextDates);
+        setTimeSlots([]);
+        setBookedTimes([]);
+        setFormData((prev) => ({ ...prev, date: "", time: "" }));
+      }
+    }
 
-  const HandleAppointment = (e) => {
-    setBookAppoint({ ...BookAppoint, [e.target.name]: e.target.value });
+    if (
+      (name === "date" || name === "doctorID") &&
+      updatedForm.date &&
+      updatedForm.doctorID
+    ) {
+      const selectedDoc = doctors.find(
+        (doc) => doc._id === updatedForm.doctorID
+      );
+      if (selectedDoc?.timeSlot) {
+        const slots = getTimeSlots(selectedDoc.timeSlot);
+        console.log("time slots of this doc are", slots);
+        setTimeSlots(slots);
+
+        await fetchBookedTimes(updatedForm.doctorID, updatedForm.date);
+      }
+    }
   };
-
-  const HandleOnsubmitAppointment = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (BookAppoint.gender === "" || BookAppoint.department === "") {
-      return notify("Please fill all the Details");
+    if (
+      !formData.patientID ||
+      !formData.patientName ||
+      !formData.email ||
+      !formData.time ||
+      !formData.date ||
+      !formData.doctorID
+    ) {
+      notify("Please fill all the required fields");
+      return;
     }
-    setLoading(true);
-    dispatch(AddPatients({ ...BookAppoint, patientId: BookAppoint.patientID})).then(
-      (res) => {
-        let data = {
-          ...BookAppoint,
-          patientId: BookAppoint.patientID
-        };
-        dispatch(CreateBooking(data));
-        notify("Appointment Booked");
-        setLoading(false);
-        setBookAppoint(InitValue);
-      }
-    );
+
+   
+
+    try {
+      setLoading(true);
+      await dispatch(AddPatients(formData));
+      await dispatch(CreateBooking(formData));
+     
+      setAvailableDates([]);
+      setTimeSlots([]);
+      setBookedTimes([]);
+      notify("Appointment Booked Successfully");
+       setFormData({
+        patientID: "",
+        patientName: "",
+        age: "",
+        gender: "",
+        mobile: "",
+        address: "",
+        email: "",
+        disease: "",
+        time: "",
+        date: "",
+        doctorID: "",
+        emergencyNo: null,
+        bloodGroup: "N/A",
+        ward: "General",
+        password: "default123",
+      });
+      
+    } catch (err) {
+      console.error(err);
+      notify("Something Went Wrong...");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,17 +222,17 @@ const Book_Appointment = () => {
         <Sidebar />
         <div className="AfterSideBar">
           <div className="Main_Add_Doctor_div">
-            <h1 style={{color:"#199A8E"}}>Book Appointment</h1>
-            <form onSubmit={HandleOnsubmitAppointment}>
-            <div>
+            <h1 style={{ color: "#199A8E" }}>Book Appointment</h1>
+            <form onSubmit={handleSubmit}>
+              <div>
                 <label>CNIC</label>
                 <div className="inputdiv">
                   <input
                     type="text"
                     placeholder="Enter CNIC without dashes"
                     name="patientID"
-                    value={BookAppoint.patientID}
-                    onChange={HandleAppointment}
+                    value={formData.patientID}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
@@ -102,8 +245,8 @@ const Book_Appointment = () => {
                     type="text"
                     placeholder="First Name"
                     name="patientName"
-                    value={BookAppoint.patientName}
-                    onChange={HandleAppointment}
+                    value={formData.patientName}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
@@ -116,8 +259,8 @@ const Book_Appointment = () => {
                     type="number"
                     placeholder="Age"
                     name="age"
-                    value={BookAppoint.age}
-                    onChange={HandleAppointment}
+                    value={formData.age}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
@@ -128,8 +271,8 @@ const Book_Appointment = () => {
                 <div className="inputdiv">
                   <select
                     name="gender"
-                    value={BookAppoint.gender}
-                    onChange={HandleAppointment}
+                    value={formData.gender}
+                    onChange={handleFormChange}
                     required
                   >
                     <option value="Choose Blood Group">Select Gender</option>
@@ -147,8 +290,8 @@ const Book_Appointment = () => {
                     type="number"
                     placeholder="Number"
                     name="mobile"
-                    value={BookAppoint.mobile}
-                    onChange={HandleAppointment}
+                    value={formData.mobile}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
@@ -160,8 +303,8 @@ const Book_Appointment = () => {
                     type="email"
                     placeholder="example@email.com"
                     name="email"
-                    value={BookAppoint.email}
-                    onChange={HandleAppointment}
+                    value={formData.email}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
@@ -172,9 +315,9 @@ const Book_Appointment = () => {
                 <div className="inputdiv">
                   <select
                     name="disease"
-                    value={BookAppoint.disease}
+                    value={formData.disease}
                     onChange={(e) => {
-                      HandleAppointment(e);
+                      handleFormChange(e);
                     }}
                     required
                   >
@@ -189,29 +332,27 @@ const Book_Appointment = () => {
                   </select>
                 </div>
               </div>
-
               {/* select doctor */}
               <div>
-              <label className="align-items-center">Choose Doctor</label>
-              <div className="form-group inputdiv" style={{width:"33rem"}}>
-                        <select
-                          className="p-2"
-                          name="doctorID"
-                          onChange={HandleAppointment}
-                          required
-                        >
-                          <option value="">Select Doctor</option>
-                          {doctors.map((doctor) => (
-                            <option key={doctor._id} value={doctor._id}>
-                              {doctor.docName} - {doctor.department}
-                            </option>
-                          ))}
-                        </select>
-                        </div>
-                        </div>   
-
+                <label className="align-items-center">Choose Doctor</label>
+                <div className="form-group inputdiv" style={{ width: "33rem" }}>
+                  <select
+                    className="form-select form-control"
+                    name="doctorID"
+                    value={formData.doctorID}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select Doctor</option>
+                    {doctors.map((doctor) => (
+                      <option key={doctor._id} value={doctor._id}>
+                        {doctor.docName} - {doctor.department}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               {/* ADDRESS SECTION  */}
-
               <div>
                 <label>Address</label>
                 <div className="inputdiv">
@@ -219,21 +360,20 @@ const Book_Appointment = () => {
                     type="text"
                     placeholder="Address line 1"
                     name="address"
-                    value={BookAppoint.address}
-                    onChange={HandleAppointment}
+                    value={formData.address}
+                    onChange={handleFormChange}
                     required
                   />
                 </div>
               </div>
               {/* DEPARTMENT SECTION */}
-
               <div>
                 <label>Department</label>
                 <div className="inputdiv">
                   <select
                     name="department"
-                    value={BookAppoint.department}
-                    onChange={HandleAppointment}
+                    value={formData.department}
+                    onChange={handleFormChange}
                     required
                   >
                     <option value="">Select</option>
@@ -249,28 +389,49 @@ const Book_Appointment = () => {
                 </div>
               </div>
               {/* APPOINTMENT DATE  */}
-              <div className="dateofAppointment">
-                <p>Date and Time </p>
+            
+              <div>
+                <label>Select Time</label>
                 <div className="inputdiv">
-                  <input
-                    type={"date"}
-                    placeholder="Choose Date"
+                  <select
+                    className="form-control"
                     name="date"
-                    value={BookAppoint.date}
-                    onChange={HandleAppointment}
+                    value={formData.date}
+                    onChange={handleFormChange}
                     required
-                  />
-                  <input
-                    type={"time"}
-                    placeholder="Choose Time"
-                    name="time"
-                    value={BookAppoint.time}
-                    onChange={HandleAppointment}
-                    required
-                  />
+                  >
+                    <option value="">Select Appointment Date</option>
+                    {availableDates.map((date, index) => (
+                      <option key={index} value={date}>
+                        {date}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
+              <div>
+                <label>Select Time</label>
+                <div className="inputdiv">
+                  <select
+                    name="time"
+                    value={formData.time}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select Time</option>
+                    {timeSlots.map((slot, i) => (
+                      <option
+                        key={i}
+                        value={slot}
+                        disabled={bookedTimes.includes(slot)}
+                      >
+                        {slot} {bookedTimes.includes(slot) ? "(Booked)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
               <button type="submit" className="book_formsubmitbutton">
                 {Loading ? "Loading..." : "Book Appointment"}
               </button>

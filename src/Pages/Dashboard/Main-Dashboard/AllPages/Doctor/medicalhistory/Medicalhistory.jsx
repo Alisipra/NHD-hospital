@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import axios from "axios";
 import styles from "../medicalhistory/History.module.css";
 import Sidebar from "../../../GlobalFiles/Sidebar";
-const url="https://nhd-server.vercel.app"
+const url = "https://nhd-server.vercel.app";
 const SearchPatientHistory = () => {
   const [cnic, setCnic] = useState("");
   const [patient, setPatient] = useState(null);
@@ -125,8 +125,12 @@ const SearchPatientHistory = () => {
                           <strong>Prescription:</strong> {record.prescription}
                         </p>
                         <p>
-                          <strong>Tests:</strong> {record.tests?.join(" / ")}
+                          <strong>Tests:</strong>{" "}
+                          {record.tests && record.tests.length > 0
+                            ? record.tests.join(" / ")
+                            : "no test conducted"}
                         </p>
+
                         <p>
                           <strong>Doctor:</strong>{" "}
                           {record.doctorID ? record.doctorID.docName : "N/A"}
@@ -149,7 +153,7 @@ const SearchPatientHistory = () => {
                       <button
                         onClick={handleNextPage}
                         disabled={currentPage === totalPages}
-                         className="w-25"
+                        className="w-25"
                       >
                         Next
                       </button>

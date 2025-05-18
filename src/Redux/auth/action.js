@@ -1,6 +1,7 @@
 import * as types from "./types";
 import axios from "axios";
 const url="https://nhd-server.vercel.app"
+
 //login user
 export const NurseLogin = (data) => async (dispatch) => {
   try {
@@ -179,16 +180,9 @@ export const AmbulanceRegister = (data) => async (dispatch) => {
       `${url}/ambulances/add`,
       data
     );
+    return res.data
     
-    // dispatch({
-    //   type: types.REGISTER_AMBULANCE_SUCCESS,
-    //   payload: {
-    //     message: res.data.message,
-    //     user: res.data.user,
-    //     // token: res.data.token,
-    //     report: res.data.report,
-    //   },
-    // });
+
   } catch (error) {
     dispatch({
       type: types.REGISTER_AMBULANCE_ERROR,
@@ -196,6 +190,7 @@ export const AmbulanceRegister = (data) => async (dispatch) => {
         message: error,
       },
     });
+     return { error: true, message: error.response?.data?.message || "Failed to add ambulance" };
   }
 };
 

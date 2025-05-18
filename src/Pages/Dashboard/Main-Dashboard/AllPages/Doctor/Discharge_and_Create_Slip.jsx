@@ -90,8 +90,8 @@ const Discharge_and_Create_Slip = () => {
     patientName: "",
     extrainfo: "",
     tests: "",
-    date: new Date(),
-    time: "",
+     date: new Date().toISOString().split("T")[0], // e.g., "2025-05-17"
+  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // e.g., "02:30 PM"
     medicines: [],
   };
 
@@ -251,7 +251,7 @@ const Discharge_and_Create_Slip = () => {
                     name="docDepartment"
                     value={ReportValue.docDepartment}
                     onChange={HandleReportChange}
-                    required
+                    
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ const Discharge_and_Create_Slip = () => {
                     name="patientBloodGroup"
                     value={ReportValue.patientBloodGroup}
                     onChange={HandleReportChange}
-                    required
+                    
                   >
                     <option value="Choose Blood Group">Select</option>
                     <option value="A+">A+</option>
@@ -366,7 +366,7 @@ const Discharge_and_Create_Slip = () => {
                     name="patientDisease"
                     value={ReportValue.patientDisease}
                     onChange={HandleReportChange}
-                    required
+                    
                   />
                 </div>
               </div>
@@ -420,15 +420,21 @@ const Discharge_and_Create_Slip = () => {
                 </div>
               </div>
 
-              <div>
-                <div className="inputdiv">
+
+
+
+                {/* testing */}
+                <div>
+                {/* <label>Patient Glucose</label> */}
+                <div className="inputdiv w-100 text-center mx-4">
                   <DiagnosisInput
                     ReportValue={ReportValue}
                     HandleReportChange={HandleReportChange}
-                    className="codes"
+                    className="codes w-auto"
                   />
                 </div>
               </div>
+             
 
               {/* ******************************************** */}
               <div>

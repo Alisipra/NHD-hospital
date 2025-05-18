@@ -35,16 +35,25 @@ const Add_Ambulance = () => {
     });
   };
 
-  const HandleAmbuSubmit = (e) => {
+  const HandleAmbuSubmit =async (e) => {
     e.preventDefault();
     setloading(true);
     let data = {
       ...AmbuData,
       type: ambuType,
     };
-    dispatch(AmbulanceRegister(data));
+    let response=await dispatch(AmbulanceRegister(data));
+    if (response?.error) {
+    notify(`❌ ${response.message}`);
+  } else if (response?.message === "ambulance already present") {
+    notify("❌ Ambulance already exists in with same Number");
+  } else {
+    notify("✅ Ambulance Added");
+    setBedData(InitData);
+  }
+
     setloading(false);
-    notify("Ambulance Added");
+    
   };
 
   if (data?.isAuthticated === false) {

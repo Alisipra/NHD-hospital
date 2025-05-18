@@ -29,13 +29,24 @@ const AddBeds = () => {
     });
   };
 
-  const HandleAmbuSubmit = (e) => {
+  const HandleAmbuSubmit = async (e) => {
     e.preventDefault();
     setloading(true);
-    dispatch(AddBed(BedData));
-    setloading(false);
+    const response = await dispatch(AddBed(BedData));
+
+   if (response?.error) {
+    notify(`❌ ${response.message}`);
+  } else if (response?.message === "Bed already present") {
+    notify("❌ Bed already exists in the same room.");
+  } else {
+    notify("✅ Bed Added");
     setBedData(InitData);
-    notify("Bed Added");
+  }
+
+    
+    setloading(false);
+    
+    
   };
 
   if (data?.isAuthticated === false) {
@@ -85,7 +96,7 @@ const AddBeds = () => {
               </div>
             {/* wards adding */}
             <div>
-                <label>Room Number</label>
+                <label>Ward</label>
                 <div className="inputdiv">
                   <input
                     type="text"

@@ -17,6 +17,10 @@ const Beds_Rooms = () => {
     dispatch(GetBeds());
   }, [dispatch]);
 
+  // test line
+  useEffect(() => {
+    
+  }, [beds]);
   const DischargePatient = (_id) => {
     const data = {
       occupied: "available",
@@ -48,7 +52,10 @@ const Beds_Rooms = () => {
 
             {/* 🆕 Ward Filter Dropdown */}
             <div style={{ marginBottom: "1.5rem" }}>
-              <label htmlFor="ward-select" style={{ marginRight: "10px", fontWeight: "bold" }}>
+              <label
+                htmlFor="ward-select"
+                style={{ marginRight: "10px", fontWeight: "bold" }}
+              >
                 Filter by Ward:
               </label>
               <select
@@ -73,10 +80,7 @@ const Beds_Rooms = () => {
                     <th>Room</th>
                     <th>Bed</th>
                     <th>Status</th>
-                    <th>Patient</th>
-                    <th>Disease</th>
-                    <th>Doctor</th>
-                    <th>Discharge</th>
+                    <th className="action">Discharge</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -85,26 +89,33 @@ const Beds_Rooms = () => {
                       <td>{ele.ward || "N/A"}</td>
                       <td>{ele.roomNumber}</td>
                       <td>{ele.bedNumber}</td>
+                      
                       <td
                         style={{
-                          color: ele.occupied === "available" ? "green" : "orange",
+                          color:
+                            ele.occupied === "available" ? "green" : "orange",
                           fontWeight: "bold",
                         }}
                       >
                         {ele.occupied}
                       </td>
-                      <td>{ele.patientID?.patientName || "No Data"}</td>
-                      <td>{ele.patientID?.disease || "No Data"}</td>
-                      <td>{ele.patientID?.docID?.docName || "No Data"}</td>
+                      {/* <td>{ele.patientID?.patientName || "N/A"}</td>
+                      <td>{ele.patientID?.disease || "N/A"}</td>
+                      <td>{ele.patientID?.docID?.docName || "N/A"}</td> */}
                       <td>
                         <button
                           disabled={ele.occupied === "available"}
                           style={{
                             border: "none",
+                            
                             outline: "none",
                             background: "transparent",
-                            color: ele.occupied === "available" ? "gray" : "red",
-                            cursor: ele.occupied === "available" ? "default" : "pointer",
+                            color:
+                              ele.occupied === "available" ? "gray" : "red",
+                            cursor:
+                              ele.occupied === "available"
+                                ? "default"
+                                : "pointer",
                           }}
                           onClick={() => DischargePatient(ele._id)}
                         >
@@ -118,7 +129,9 @@ const Beds_Rooms = () => {
 
               {/* 🛑 No beds found message */}
               {filteredBeds.length === 0 && (
-                <p style={{ marginTop: "1rem", color: "gray" }}>No beds found for selected ward.</p>
+                <p style={{ marginTop: "1rem", color: "gray" }}>
+                  No beds found for selected ward.
+                </p>
               )}
             </div>
           </div>

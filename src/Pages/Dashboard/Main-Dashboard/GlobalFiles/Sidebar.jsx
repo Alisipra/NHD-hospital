@@ -188,24 +188,6 @@ const Sidebar = () => {
                 </div>
               </Link>
             ) : null}
-            {/* {user?.userType === "admin" ? (
-              <Link
-                className="link"
-                activeclassname="active"
-                to={"/checkpayment"}
-              >
-                <div className="icon">
-                  <RiSecurePaymentLine className="mainIcon" />
-                </div>
-                <div
-                  style={{ display: isOpen ? "block" : "none" }}
-                  className="link_text"
-                >
-                  Payments
-                </div>
-              </Link>
-            ) : null} */}
-
             {user?.userType === "doctor" ? (
               <Link
                 className="link"
@@ -243,7 +225,7 @@ const Sidebar = () => {
                   style={{ display: isOpen ? "block" : "none" }}
                   className="link_text"
                 >
-                  Reports
+                 Admitted Patients
                 </div>
               </Link>
             ) : null}

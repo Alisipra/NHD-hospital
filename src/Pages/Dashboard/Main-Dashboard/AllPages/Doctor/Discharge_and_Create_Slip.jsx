@@ -179,6 +179,7 @@ const Discharge_and_Create_Slip = () => {
       const res = await axios.get(`${url}/patients/${cnic}`);
       const { patient } = res.data;
       
+      
 
       setReportValue((prev) => ({
         ...prev,

@@ -4,7 +4,7 @@ import { MdPersonAdd } from "react-icons/md";
 import { FaUserNurse } from "react-icons/fa";
 import { RiEmpathizeLine } from "react-icons/ri";
 import { FaBed } from "react-icons/fa";
-import { MdOutlineBedroomParent } from "react-icons/md";
+
 import { FaAmbulance } from "react-icons/fa";
 import { BsFillBookmarkCheckFill } from "react-icons/bs";
 import { MdPayment } from "react-icons/md";
@@ -43,26 +43,14 @@ const FrontPage = () => {
   
 
   
-  // ✅ Defensive fallback to empty array
+  //  Defensive fallback to empty array
   const availableBeds = beds?.filter((bed) => bed.occupied === "available")?.length || 0;
   const occupiedBeds = beds?.filter((bed) => bed.occupied === "occupied")?.length || 0;
 
   
   return (
 
-    // test
     
-
-
-
-
-
-
-
-
-
-
-
     <div className="container">
       <Sidebar />
       <div className="AfterSideBar">
@@ -138,12 +126,7 @@ const FrontPage = () => {
           </div>
         </div>
         {/* ************************************* */}
-        {/* <div className="patientDetails">
-          <h1 style={{color:"#199A8E"}}>Patient Details</h1>
-          <div className="patientBox">
-            <Table columns={columns} dataSource={patients} />
-          </div>
-        </div> */}
+       
       </div>
     </div>
   );

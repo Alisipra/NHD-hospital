@@ -44,11 +44,11 @@ const Add_Ambulance = () => {
     };
     let response=await dispatch(AmbulanceRegister(data));
     if (response?.error) {
-    notify(`❌ ${response.message}`);
+    notify(` ${response.message}`);
   } else if (response?.message === "ambulance already present") {
-    notify("❌ Ambulance already exists in with same Number");
+    notify(" Ambulance already exists in with same Number");
   } else {
-    notify("✅ Ambulance Added");
+    notify(" Ambulance Added");
     setBedData(InitData);
   }
 

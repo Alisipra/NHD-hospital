@@ -36,12 +36,12 @@ const SearchPatientHistory = () => {
       } else {
         setPatient(null);
         setHistory([]);
-        console.log("Patient does not exist");
+        
         toast.error("Patient not found!");
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        console.log("Patient not found");
+        
         toast.warn("Patient with this CNIC does not exist.");
         setPatient(null);
         setHistory([]);

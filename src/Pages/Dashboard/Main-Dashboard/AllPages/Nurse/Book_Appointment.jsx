@@ -156,7 +156,7 @@ const Book_Appointment = () => {
       );
       if (selectedDoc?.timeSlot) {
         const slots = getTimeSlots(selectedDoc.timeSlot);
-        console.log("time slots of this doc are", slots);
+        
         setTimeSlots(slots);
 
         await fetchBookedTimes(updatedForm.doctorID, updatedForm.date);

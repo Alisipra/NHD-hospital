@@ -89,7 +89,7 @@ const Doctor_Profile = () => {
           <div className="maindoctorProfile">
             <div className="firstBox">
               <div>
-                {console.log("Image URL:", data?.user?.image)}
+                {/* {console.log("Image URL:", data?.user?.image)} */}
                 <img src={data?.user?.image} alt="docimg" />
               </div>
               <hr />

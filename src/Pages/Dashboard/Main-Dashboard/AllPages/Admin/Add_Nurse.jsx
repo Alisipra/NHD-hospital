@@ -43,7 +43,7 @@ const Add_Nurse = () => {
     e.preventDefault();
     setLoading(true);
     dispatch(NurseRegister(NurseValue)).then((res) => {
-      console.log(res)
+      
       if (res.message === "Nurse already exists") {
         setLoading(false);
         return notify("Nurse Already Exist");

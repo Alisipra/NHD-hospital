@@ -35,11 +35,11 @@ const AddBeds = () => {
     const response = await dispatch(AddBed(BedData));
 
    if (response?.error) {
-    notify(`❌ ${response.message}`);
+    notify(` ${response.message}`);
   } else if (response?.message === "Bed already present") {
-    notify("❌ Bed already exists in the same room.");
+    notify(" Bed already exists in the same room.");
   } else {
-    notify("✅ Bed Added");
+    notify(" Bed Added");
     setBedData(InitData);
   }
 

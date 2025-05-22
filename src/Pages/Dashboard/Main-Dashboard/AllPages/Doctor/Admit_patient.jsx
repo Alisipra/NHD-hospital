@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../../GlobalFiles/Sidebar";
 import doctor from "../../../../../img/doctoravatar.png";
 import axios from "axios";
+const notify = (text) => toast(text);
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-const url="https://nhd-server.vercel.app"
+ const url = "https://nhd-server.vercel.app";
+
 const AdmitPatientForm = () => {
-  const [patientDetails, setPatientDetails] = useState({
+  const [ReportValue, setReportValue] = useState({
     patientID: "",
     patientName: "",
     age: "",
@@ -61,11 +63,79 @@ const AdmitPatientForm = () => {
     fetchAvailableBeds();
     fetchAvailableDoctor();
   }, []);
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPatientDetails({ ...patientDetails, [name]: value });
+
+
+
+  const HandleReportChange = (e) => {
+    setReportValue({ ...ReportValue, [e.target.name]: e.target.value });
   };
 
+  const HandleReportSubmit = async (e) => {
+    try {
+      e.preventDefault();
+
+      const ipdData = {
+        ...ReportValue,
+        bedNumber: bedDetails.bedNumber,
+        roomNo: bedDetails.roomNumber,
+        docID: ReportValue.docID,
+      };
+
+      try {
+        const ipdResponse = await axios.post(
+          `${url}/patients/admitPatient`,
+          ipdData
+        );
+
+        if (ipdResponse.data.message == "Patient admitted successfully.") {
+          toast.success(
+            ipdResponse.data.message || "Patient admitted successfully"
+          );
+           // Reseting Form
+      setReportValue({
+        patientID: "",
+        patientName: "",
+        age: "",
+        gender: "",
+        mobile: "",
+        emergencyNo: "",
+        bloodGroup: "",
+        email: "",
+        ward: "",
+        bedNumber: "",
+        reasonForAdmission: "",
+        guardianName: "",
+        guardianContact: "",
+        doctorAssigned: "",
+        docID: "",
+        nurseID: "",
+        DOB: "",
+        address: "",
+        disease: "",
+        test: "",
+        department: "",
+        roomNo: "",
+      });
+      setbedDetails(initBed);
+        } else {
+          toast.error(
+            ipdResponse.data.message || "Patient Already admitted..."
+          );
+        }
+
+        // If IPD succeeds, then save to medical history
+
+        // Optional: reset form here
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        toast.error(error.response?.data?.message || "Failed to admit patient");
+      }
+
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // handle bed change
   const initBed = {
     bedNumber: "",
@@ -89,79 +159,51 @@ const AdmitPatientForm = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const ipdData = {
-      ...patientDetails,
-      bedNumber: bedDetails.bedNumber,
-      roomNo: bedDetails.roomNumber,
-      docID: patientDetails.docID,
-    };
-
-    try {
-      const ipdResponse = await axios.post(
-        `${url}/patients/admitPatient`,
-        ipdData
-      );
-
-      if (ipdResponse.data.message == "Patient admitted successfully.") {
-        toast.success(
-          ipdResponse.data.message || "Patient admitted successfully"
-        );
-      } else {
-        toast.error(ipdResponse.data.message || "Patient Already admitted...");
-      }
-
-      // If IPD succeeds, then save to medical history
-
-      // Optional: reset form here
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error(error.response?.data?.message || "Failed to admit patient");
-    }
-
-    // Reseting Form
-    setPatientDetails({
-      patientID: "",
-      patientName: "",
-      age: "",
-      gender: "",
-      mobile: "",
-      emergencyNo: "",
-      bloodGroup: "",
-      email: "",
-      ward: "",
-      bedNumber: "",
-      reasonForAdmission: "",
-      guardianName: "",
-      guardianContact: "",
-      doctorAssigned: "",
-      docID: "",
-      nurseID: "",
-      DOB: "",
-      address: "",
-      disease: "",
-      test: "",
-      department: "",
-      roomNo: "",
-    });
-    setbedDetails(initBed);
-  };
-
+  
   const doctorInfo = useSelector((state) => state.auth.data.user);
-  console.log("Doctor Info:", doctorInfo);
 
   // Then auto-fill doctor on patient admission
   useEffect(() => {
     if (doctorInfo && doctorInfo.userType === "doctor") {
-      setPatientDetails((prev) => ({
+      setReportValue((prev) => ({
         ...prev,
         doctorAssigned: doctorInfo.docName,
         // docID: doctorInfo.docID,
       }));
     }
   }, [doctorInfo]);
+
+  // autofill logic taking place
+  const fetchPatientDetails = async (cnic) => {
+    if (cnic.length < 13) return; // wait until CNIC is fully typed
+
+    try {
+      const res = await axios.get(`${url}/patients/${cnic}`);
+      const { patient } = res.data;
+      
+      setReportValue((prev) => ({
+        ...prev,
+        patientName: patient.patientName || "",
+        age: patient.age || "",
+        mobile: patient.mobile || "",
+        email: patient.email || "",
+        gender: patient.gender || "",
+        emergencyNo: patient.emergencyNo || "",
+        bloodGroup: patient.bloodGroup || "",
+      }));
+
+      notify("Patient details auto-filled");
+    } catch (err) {
+      console.error(err);
+      notify("This is New Patient...");
+    }
+  };
+  useEffect(() => {
+    const cnic = ReportValue.patientID;
+    if (cnic.length === 13) {
+      fetchPatientDetails(cnic);
+    }
+  }, [ReportValue.patientID]);
 
   return (
     <>
@@ -172,7 +214,7 @@ const AdmitPatientForm = () => {
         <div className="container-fluid d-flex justify-content-center">
           <div>
             <div className="container shadow-lg m-5 p-5">
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={HandleReportSubmit}>
                 <h2
                   className="text-center fw-bold"
                   style={{ color: "#199A8E" }}
@@ -199,8 +241,8 @@ const AdmitPatientForm = () => {
                       type="number"
                       name="patientID"
                       placeholder="CNIC"
-                      value={patientDetails.patientID}
-                      onChange={handleChange}
+                      value={ReportValue.patientID}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -212,8 +254,8 @@ const AdmitPatientForm = () => {
                       type="text"
                       name="patientName"
                       placeholder="Patient Name"
-                      value={patientDetails.patientName}
-                      onChange={handleChange}
+                      value={ReportValue.patientName}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -225,8 +267,8 @@ const AdmitPatientForm = () => {
                       type="number"
                       name="age"
                       placeholder="Enter age"
-                      value={patientDetails.age}
-                      onChange={handleChange}
+                      value={ReportValue.age}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -236,8 +278,8 @@ const AdmitPatientForm = () => {
                   <div className="inputdiv">
                     <select
                       name="gender"
-                      value={patientDetails.gender}
-                      onChange={handleChange}
+                      value={ReportValue.gender}
+                      onChange={HandleReportChange}
                       required
                     >
                       <option value="">Select Gender</option>
@@ -255,8 +297,8 @@ const AdmitPatientForm = () => {
                       type="number"
                       name="mobile"
                       placeholder="Enter Mobile No"
-                      value={patientDetails.mobile}
-                      onChange={handleChange}
+                      value={ReportValue.mobile}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -268,8 +310,8 @@ const AdmitPatientForm = () => {
                       type="number"
                       name="emergencyNo"
                       placeholder="Enter Any Emergency No"
-                      value={patientDetails.emergencyNo}
-                      onChange={handleChange}
+                      value={ReportValue.emergencyNo}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -279,8 +321,8 @@ const AdmitPatientForm = () => {
                   <div className="inputdiv">
                     <select
                       name="bloodGroup"
-                      value={patientDetails.bloodGroup}
-                      onChange={handleChange}
+                      value={ReportValue.bloodGroup}
+                      onChange={HandleReportChange}
                       required
                     >
                       <option value="">Select Blood Group</option>
@@ -303,8 +345,8 @@ const AdmitPatientForm = () => {
                       type="email"
                       name="email"
                       placeholder="email@gmail.com"
-                      value={patientDetails.email}
-                      onChange={handleChange}
+                      value={ReportValue.email}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -316,8 +358,8 @@ const AdmitPatientForm = () => {
                   <div className="inputdiv">
                     <select
                       name="ward"
-                      value={patientDetails.ward}
-                      onChange={handleChange}
+                      value={ReportValue.ward}
+                      onChange={HandleReportChange}
                       required
                     >
                       <option value="">Select Ward</option>
@@ -376,8 +418,8 @@ const AdmitPatientForm = () => {
                     <textarea
                       name="reasonForAdmission"
                       placeholder="Surgery,ICU etc"
-                      value={patientDetails.reasonForAdmission}
-                      onChange={handleChange}
+                      value={ReportValue.reasonForAdmission}
+                      onChange={HandleReportChange}
                       required
                     ></textarea>
                   </div>
@@ -390,8 +432,8 @@ const AdmitPatientForm = () => {
                       type="text"
                       name="guardianName"
                       placeholder="Enter Guardian Name"
-                      value={patientDetails.guardianName}
-                      onChange={handleChange}
+                      value={ReportValue.guardianName}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -404,8 +446,8 @@ const AdmitPatientForm = () => {
                       type="number"
                       name="guardianContact"
                       placeholder="Guardian Contact"
-                      value={patientDetails.guardianContact}
-                      onChange={handleChange}
+                      value={ReportValue.guardianContact}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -417,24 +459,24 @@ const AdmitPatientForm = () => {
                     <input
                       type="text"
                       name="doctorAssigned"
-                      value={patientDetails.doctorAssigned}
+                      value={ReportValue.doctorAssigned}
                       readOnly
                     />
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <label>Date of Birth</label>
                   <div className="inputdiv">
                     <input
                       type="date"
                       name="DOB"
                       value={patientDetails.DOB}
-                      onChange={handleChange}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   <label>Address</label>
@@ -442,8 +484,8 @@ const AdmitPatientForm = () => {
                     <textarea
                       name="address"
                       placeholder="Permanent Address"
-                      value={patientDetails.address}
-                      onChange={handleChange}
+                      value={ReportValue.address}
+                      onChange={HandleReportChange}
                       required
                     ></textarea>
                   </div>
@@ -456,8 +498,8 @@ const AdmitPatientForm = () => {
                       type="text"
                       name="disease"
                       placeholder="Specific Disease"
-                      value={patientDetails.disease}
-                      onChange={handleChange}
+                      value={ReportValue.disease}
+                      onChange={HandleReportChange}
                       required
                     />
                   </div>
@@ -468,9 +510,9 @@ const AdmitPatientForm = () => {
                   <div className="inputdiv">
                     <textarea
                       name="test"
-                      value={patientDetails.test}
+                      value={ReportValue.test}
                       placeholder="test performed"
-                      onChange={handleChange}
+                      onChange={HandleReportChange}
                       required
                     ></textarea>
                   </div>
@@ -491,7 +533,11 @@ const AdmitPatientForm = () => {
                 </div> */}
 
                 <div className="align-content-center mx-auto w-25">
-                  <button className="rounded-2 w-100 m-3 p-1" type="submit">
+                  <button
+                    className="rounded-2 w-100 m-3 p-1"
+                    type="submit"
+                    onClick={HandleReportSubmit}
+                  >
                     Admit Patient
                   </button>
                 </div>

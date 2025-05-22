@@ -189,27 +189,7 @@ const Add_Patient = () => {
     }
   };
   
-  // const handleChange = (info) => {
-  //   if (info.file.status === "uploading") {
-  //     setLoading(true);
-  //     return;
-  //   }
-  //   if (info.file.status === "done") {
-  //     // Get this url from response in real world.
-  //     getBase64(info.file.originFileObj, (url) => {
-  //       setLoading(false);
-  //       setImageUrl(url);
-  //     });
-  //   }
-  // };
-
-  // const uploadButton = (
-  //   <div>
-  //     {loading ? <LoadingOutlined /> : <PlusOutlined />}
-  //     <div style={{ marginTop: 8 }}>Upload</div>
-  //   </div>
-  // );
-
+  
   if (data?.isAuthticated === false) {
     return <Navigate to={"/"} />;
   }
@@ -457,52 +437,9 @@ const Add_Patient = () => {
                   />
                 </div>
               </div>
-
-              {/* <div>
-                <label>Department</label>
-                <div className="inputdiv">
-                  <select
-                    name="department"
-                    value={AddPatient.department}
-                    onChange={HandleAppointment}
-                    required
-                  >
-                    <option value="">Select</option>
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Neurology">Neurology</option>
-                    <option value="ENT">ENT</option>
-                    <option value="Ophthalmologist">Ophthalmologist</option>
-                    <option value="Anesthesiologist">Anesthesiologist</option>
-                    <option value="Dermatologist">Dermatologist</option>
-                    <option value="Oncologist">Oncologist</option>
-                    <option value="Psychiatrist">Psychiatrist</option>
-                  </select>
-                </div>
-              </div> */}
               <div>
                 <label>Doctor</label>
                 <div className="inputdiv">
-                  {/* <select
-                    name="docID"
-                    value={AddPatient.docID}
-                    onChange={HandleAppointment}
-                    required
-                  >
-                    <option value="">Select doctor</option>
-                    <option value="63d228df1742e138a3727857">
-                     Dr.Umer Ali Tahir
-                    </option>
-                    <option value="63d2270dfe66e89c9be342f9">
-                      Dr.Hassan Shahid
-                    </option>
-                    <option value="63d2270dfe66e89c9be342f9">
-                      Dr.Sajid Zafar
-                    </option>
-                    <option value="63d2270dfe66e89c9be342f9">
-                      Dr. Zaid 
-                    </option>
-                   
-                  </select> */}
                   <select
                     className="p-2"
                     name="docID"
@@ -555,28 +492,7 @@ const Add_Patient = () => {
                   />
                 </div>
               </div>
-              {/* ADD IMAGES  */}
-              {/* <div>
-            <label>Image</label>
-            <div className="inputdiv">
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-uploader"
-                showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                beforeUpload={beforeUpload}
-                onChange={handleChange}
-                style={{ display: "block" }}
-              >
-                {imageUrl ? (
-                  <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
-                ) : (
-                  uploadButton
-                )}
-              </Upload>
-            </div>
-          </div> */}
+             
               {/* SUBMIT BUTTON  */}
 
               <button

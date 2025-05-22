@@ -62,7 +62,7 @@ const AddDoctor = () => {
         timeSlot: res.data.timeSlot,
       };
 
-      console.log(data, "DOCTOR REGISTER SUCCESSFULLY");
+      // console.log(data, "DOCTOR REGISTER SUCCESSFULLY");
       dispatch(SendPassword(data)).then((res) =>
         notify("Doctor Registered Successfully")
       );
